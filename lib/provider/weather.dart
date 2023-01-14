@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:ffi';
 import 'package:http/http.dart' as http;
 import 'package:flutter/cupertino.dart';
 
@@ -16,11 +15,17 @@ class Weather {
     date = DateTime.tryParse(
         "${weather["data_pomiaru"]} ${weather["godzina_pomiaru"]}:00");
     temperature = double.parse(weather["temperatura"]);
-    //windSpeed = int.tryParse(weather["predkosc_wiatru"]);
-    //windDirection = int.parse(weather["kierunek_wiatru"]);
+    if (weather["predkosc_wiatru"] != null) {
+      windSpeed = int.parse(weather["predkosc_wiatru"]);
+    }
+    if (weather["kierunek_wiatru"] != null) {
+      windDirection = int.parse(weather["kierunek_wiatru"]);
+    }
     relativeHumidity = double.parse(weather["wilgotnosc_wzgledna"]);
     rain = double.parse(weather["suma_opadu"]);
-    //pressure = double.tryParse(weather["cisnienie"]);
+    if (weather["cinsnienie"] != null) {
+      pressure = double.parse(weather["cisnienie"]);
+    }
   }
 
   late final int? stationId;
