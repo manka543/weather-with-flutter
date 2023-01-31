@@ -18,9 +18,10 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         title: 'Pogoda',
         theme: ThemeData(
+          useMaterial3: true,
           primarySwatch: Colors.blue,
         ),
-        darkTheme: ThemeData.dark(),
+        darkTheme: ThemeData.dark(useMaterial3: true),
         home: const HomeView(),
         routes: {
           "/home": (context) => const HomeView(),
