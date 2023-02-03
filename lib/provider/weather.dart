@@ -2,12 +2,6 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter/cupertino.dart';
 
-enum Status {
-  init,
-  normal,
-  error,
-}
-
 class Weather {
   Weather({required Map<String, dynamic> weather}) {
     stationId = int.parse(weather["id_stacji"]);
@@ -54,7 +48,7 @@ class Weather {
 class WeatherProvider extends ChangeNotifier {
   List<Weather>? data;
   List<Weather>? selectedData = [];
-
+  
   void getData() async {
     var url = Uri.https('danepubliczne.imgw.pl', 'api/data/synop');
     var response = await http.get(url);

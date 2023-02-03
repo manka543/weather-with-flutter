@@ -26,22 +26,30 @@ class _HomeViewState extends State<HomeView> {
 
   @override
   Widget build(BuildContext context) {
-    var data = context.watch<WeatherProvider>().selectedData;
+    var provider = context.watch<WeatherProvider>();
+    var data = provider.selectedData;
     return Scaffold(
       body: CustomScrollView(slivers: [
         SliverAppBar(
           floating: true,
           pinned: true,
           snap: true,
-          title: const Text("Home Page"),
+          title: const Text("Pogoda"),
+          backgroundColor: Colors.black54,
           bottom: Tab(
             child: Container(
-              decoration: const BoxDecoration(borderRadius: BorderRadius.vertical(bottom: Radius.circular(25))),
+              decoration: const BoxDecoration(
+                  borderRadius:
+                      BorderRadius.vertical(bottom: Radius.circular(25))),
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: TextField(
-                  onChanged: (value) => context.read<WeatherProvider>().search(_searchController.text),
-                  onSubmitted: (value) => context.read<WeatherProvider>().search(_searchController.text),
+                  onChanged: (value) => context
+                      .read<WeatherProvider>()
+                      .search(_searchController.text),
+                  onSubmitted: (value) => context
+                      .read<WeatherProvider>()
+                      .search(_searchController.text),
                   controller: _searchController,
                   decoration: const InputDecoration(
                     hintText: "Nazwa stacji np.Białystok",
@@ -51,7 +59,17 @@ class _HomeViewState extends State<HomeView> {
               ),
             ),
           ),
-          // actions: [Center(child: Text(data?[0].date?.toString() ?? ""))],
+          actions: [
+            Center(child: Text(data?.isNotEmpty ?? false ? data![0].date.toString() : "")),
+            PopupMenuButton(itemBuilder: (context) {
+              return <PopupMenuEntry>[
+                PopupMenuItem(child: TextButton(
+                  onPressed: () => context.read<WeatherProvider>().refresh(),
+                  child: const Text("Odśwież dane"),
+                )),
+              ];
+            },),
+          ],
         ),
         SliverList(
           delegate: SliverChildBuilderDelegate(

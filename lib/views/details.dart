@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:pogoda/provider/weather.dart';
 import 'package:pogoda/widget/detail.dart';
@@ -25,6 +23,7 @@ class _DetailsViewState extends State<DetailsView> {
         .singleWhere((element) => element.stationId == arg);
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Colors.black54,
         title: Title(
           color: Colors.black,
           title: "Detale",
@@ -48,8 +47,15 @@ class _DetailsViewState extends State<DetailsView> {
               padding: const EdgeInsets.all(15),
               child: Container(
                 padding: const EdgeInsets.all(15),
-                decoration: BoxDecoration(borderRadius: BorderRadius.circular(15), color: Colors.black26),
-                child: Center(child: Text(weather.station ?? "Error 404", style: const TextStyle(fontSize: 35),)),
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(15),
+                    color: Colors.black54),
+                child: Center(
+                  child: Text(
+                    weather.station ?? "Error 404",
+                    style: const TextStyle(fontSize: 35),
+                  ),
+                ),
               ),
             ),
             Detail.temperature(weather.temperature),
