@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:pogoda/provider/weather.dart';
+import 'package:pogoda/widget/home/favourite.dart';
+import 'package:pogoda/widget/home/list.dart';
+import 'package:pogoda/widget/home/stats.dart';
 import 'package:provider/provider.dart';
 
 class HomeView extends StatefulWidget {
@@ -11,6 +14,7 @@ class HomeView extends StatefulWidget {
 
 class _HomeViewState extends State<HomeView> {
   late final TextEditingController _searchController;
+  int _screen = 0;
 
   @override
   void initState() {
@@ -26,80 +30,65 @@ class _HomeViewState extends State<HomeView> {
 
   @override
   Widget build(BuildContext context) {
-    var provider = context.watch<WeatherProvider>();
-    var data = provider.selectedData;
     return Scaffold(
-      body: CustomScrollView(slivers: [
-        SliverAppBar(
-          floating: true,
-          pinned: true,
-          snap: true,
-          title: const Text("Pogoda"),
-          backgroundColor: Colors.black54,
-          bottom: Tab(
-            child: Container(
-              decoration: const BoxDecoration(
-                  borderRadius:
-                      BorderRadius.vertical(bottom: Radius.circular(25))),
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: TextField(
-                  onChanged: (value) => context
-                      .read<WeatherProvider>()
-                      .search(_searchController.text),
-                  onSubmitted: (value) => context
-                      .read<WeatherProvider>()
-                      .search(_searchController.text),
-                  controller: _searchController,
-                  decoration: const InputDecoration(
-                    hintText: "Nazwa stacji np.Białystok",
-                    icon: Icon(Icons.search),
-                  ),
-                ),
-              ),
+      appBar: _screen != 0
+          ? AppBar(
+              title: const Text("Pogoda"),
+              backgroundColor: Colors.black,
+              actions: [
+                Text(
+                    context.read<WeatherProvider>().data?[0].date?.toString() ??
+                        ""),
+                PopupMenuButton(
+                  itemBuilder: (context) => <PopupMenuEntry>[
+                    PopupMenuItem(
+                      child: TextButton(
+                        onPressed: () =>
+                            context.read<WeatherProvider>().refresh(),
+                        child: const Text("Odśwież dane"),
+                      ),
+                    ),
+                  ],
+                )
+              ],
+            )
+          : null,
+      bottomNavigationBar: BottomNavigationBar(
+          currentIndex: _screen,
+          unselectedItemColor: Colors.white,
+          selectedItemColor: Colors.purple.shade100,
+          onTap: (value) {
+            setState(() {
+              _screen = value;
+            });
+          },
+          items: const [
+            BottomNavigationBarItem(
+              icon: Icon(Icons.list),
+              label: "list",
             ),
-          ),
-          actions: [
-            Center(child: Text(data?.isNotEmpty ?? false ? data![0].date.toString() : "")),
-            PopupMenuButton(itemBuilder: (context) {
-              return <PopupMenuEntry>[
-                PopupMenuItem(child: TextButton(
-                  onPressed: () => context.read<WeatherProvider>().refresh(),
-                  child: const Text("Odśwież dane"),
-                )),
-              ];
-            },),
-          ],
-        ),
-        SliverList(
-          delegate: SliverChildBuilderDelegate(
-            childCount: data?.length,
-            (context, index) {
-              return Padding(
-                  padding: const EdgeInsets.all(7),
-                  child: ListTile(
-                    onTap: () => Navigator.of(context).pushNamed("/details",
-                        arguments: data?[index].stationId),
-                    tileColor: Colors.black54,
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20)),
-                    title: Hero(
-                        tag: "Title${data?[index].stationId}",
-                        child: Text(
-                          data?[index].station ?? "",
-                          style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 16,
-                              decoration: TextDecoration.none,
-                              fontFamily: "Roboto",
-                              fontWeight: FontWeight.bold),
-                        )),
-                    trailing: Text(data?[index].temperature.toString() ?? ""),
-                  ));
-            },
-          ),
-        ),
-      ]),
+            BottomNavigationBarItem(
+                icon: Icon(
+                  Icons.star_border,
+                ),
+                label: "favourite"),
+            BottomNavigationBarItem(
+                icon: Icon(Icons.arrow_upward), label: "stats"),
+          ]),
+      body: Builder(
+        builder: (context) {
+          switch (_screen) {
+            case 0:
+              return const ListPage();
+            case 1:
+              return const FavouritePage();
+            case 2:
+              return const StatsPage();
+            default:
+              return const Center(child: Text("#Problemy"));
+          }
+        },
+      ),
     );
   }
 }

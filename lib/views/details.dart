@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:math' as math;
 import 'package:pogoda/provider/weather.dart';
 import 'package:pogoda/widget/detail.dart';
 import 'package:provider/provider.dart';
@@ -26,18 +27,14 @@ class _DetailsViewState extends State<DetailsView> {
         backgroundColor: Colors.black54,
         title: Title(
           color: Colors.black,
-          title: "Detale",
-          child: Hero(
-              tag: "Title$arg",
-              child: Text(
-                weather.station!,
-                style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 25,
-                    decoration: TextDecoration.none,
-                    fontFamily: "Roboto",
-                    fontWeight: FontWeight.bold),
-              )),
+          child: const Text(
+            "Detale",
+            style: TextStyle(
+                color: Colors.white,
+                decoration: TextDecoration.none,
+                fontFamily: "Roboto",
+                fontWeight: FontWeight.bold),
+          ),
         ),
       ),
       body: SingleChildScrollView(
@@ -53,7 +50,12 @@ class _DetailsViewState extends State<DetailsView> {
                 child: Center(
                   child: Text(
                     weather.station ?? "Error 404",
-                    style: const TextStyle(fontSize: 35),
+                    style: const TextStyle(
+                                color: Colors.white,
+                                decoration: TextDecoration.none,
+                                fontSize: 35,
+                                fontFamily: "Roboto",
+                                fontWeight: FontWeight.bold),
                   ),
                 ),
               ),
@@ -62,8 +64,22 @@ class _DetailsViewState extends State<DetailsView> {
             Detail.pressure(weather.pressure),
             Detail.rain(weather.rain),
             Detail.relativeHumidity(weather.relativeHumidity),
-            Detail.wind(weather.windSpeed),
             Detail.date(weather.date),
+            Padding(
+      padding: const EdgeInsets.all(8),
+      child: Container(
+        decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(15), color: Colors.black38),
+        padding: const EdgeInsets.all(15),
+        child:
+            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+          const Text("Wiatr", style: TextStyle(fontSize: 17)),
+          Expanded(child: Container()),
+          Text("${weather.windSpeed}km/h", style: const TextStyle(fontSize: 17)),
+          Transform.rotate(angle: weather.windDirection! / 180 * math.pi,child: const Icon(Icons.arrow_upward)),
+        ]),
+      ),
+    ),
           ],
         ),
       ),
