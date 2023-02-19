@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter/cupertino.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Weather {
   Weather({required Map<String, dynamic> weather}) {
@@ -42,20 +43,21 @@ class Weather {
   String toString() {
     return "Instance of class 'Weather', id: $stationId, station: $station, date: $date, temperature: $temperature, windSpeed: $windSpeed, windDirection: $windDirection, relativeHumidity: $relativeHumidity, rain: $rain, pressure: $pressure";
   }
-
 }
 
 class WeatherProvider extends ChangeNotifier {
-  List<Weather>? data;
-  List<Weather>? selectedData = [];
-  
+  final List<Weather?> data = [];
+  final List<Weather?> selectedData = [];
+  final List<int> favouriteStations = [];
+  static const String _favouriteLabel = "favourites";
+
   void getData() async {
     var url = Uri.https('danepubliczne.imgw.pl', 'api/data/synop');
     var response = await http.get(url);
     final parsedData = jsonDecode(response.body);
-    data = [];
+    data.clear();
     for (var weather in parsedData) {
-      data!.add(Weather(weather: weather));
+      data.add(Weather(weather: weather));
     }
     search("");
     notifyListeners();
@@ -66,17 +68,43 @@ class WeatherProvider extends ChangeNotifier {
   }
 
   void search(String? word) {
-    if(word == "" || word == " " || word == null){
-      selectedData = data;
+    if (word == "" || word == " " || word == null) {
+      selectedData.addAll(data);
       notifyListeners();
       return;
     }
-    selectedData = [];
-    for (var station in data!){
-      if (station.station?.toLowerCase().contains(word) ?? false) {
-        selectedData!.add(station);
+    selectedData.clear();
+    for (var station in data) {
+      if (station?.station?.toLowerCase().contains(word) ?? false) {
+        selectedData.add(station);
       }
     }
+    notifyListeners();
+  }
+
+  void loadFavourites() async {
+    final prefs = await SharedPreferences.getInstance();
+    final stringFavourites = prefs.getStringList(_favouriteLabel) ?? [];
+    favouriteStations.clear();
+    for (var id in stringFavourites) {
+      favouriteStations.add(int.parse(id));
+    }
+    notifyListeners();
+  }
+
+  void like(int? id) async {
+    if (id == null) return;
+    if(favouriteStations.contains(id)){
+      favouriteStations.remove(id);
+    } else {
+      favouriteStations.add(id);
+    }
+    var stringIds = <String>[];
+    for (var intId in favouriteStations) {
+      stringIds.add(intId.toString());
+    }
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setStringList(_favouriteLabel, stringIds);
     notifyListeners();
   }
 

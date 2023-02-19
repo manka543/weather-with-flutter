@@ -12,83 +12,55 @@ class HomeView extends StatefulWidget {
   State<HomeView> createState() => _HomeViewState();
 }
 
-class _HomeViewState extends State<HomeView> {
+class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
   late final TextEditingController _searchController;
-  int _screen = 0;
+  late final TabController _tabController;
 
   @override
   void initState() {
     _searchController = TextEditingController();
+    _tabController = TabController(vsync: this, length: 3);
     super.initState();
   }
 
   @override
   void dispose() {
     _searchController.dispose();
+    _tabController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: _screen != 0
-          ? AppBar(
-              title: const Text("Pogoda"),
-              backgroundColor: Colors.black,
-              actions: [
-                Text(
-                    context.read<WeatherProvider>().data?[0].date?.toString() ??
-                        ""),
-                PopupMenuButton(
-                  itemBuilder: (context) => <PopupMenuEntry>[
-                    PopupMenuItem(
-                      child: TextButton(
-                        onPressed: () =>
-                            context.read<WeatherProvider>().refresh(),
-                        child: const Text("Odśwież dane"),
-                      ),
-                    ),
-                  ],
-                )
-              ],
-            )
-          : null,
-      bottomNavigationBar: BottomNavigationBar(
-          currentIndex: _screen,
-          unselectedItemColor: Colors.white,
-          selectedItemColor: Colors.purple.shade100,
-          onTap: (value) {
-            setState(() {
-              _screen = value;
-            });
-          },
-          items: const [
-            BottomNavigationBarItem(
-              icon: Icon(Icons.list),
-              label: "list",
-            ),
-            BottomNavigationBarItem(
-                icon: Icon(
-                  Icons.star_border,
+        bottomNavigationBar: Stack(children: [
+          Container(
+            color: Colors.black,
+            height: 73,
+          ),
+          TabBar(
+              splashBorderRadius: BorderRadius.circular(15),
+              automaticIndicatorColorAdjustment: false,
+              controller: _tabController,
+              tabs: const [
+                Tab(
+                  icon: Icon(Icons.list),
+                  text: "Lista",
                 ),
-                label: "favourite"),
-            BottomNavigationBarItem(
-                icon: Icon(Icons.arrow_upward), label: "stats"),
-          ]),
-      body: Builder(
-        builder: (context) {
-          switch (_screen) {
-            case 0:
-              return const ListPage();
-            case 1:
-              return const FavouritePage();
-            case 2:
-              return const StatsPage();
-            default:
-              return const Center(child: Text("#Problemy"));
-          }
-        },
-      ),
-    );
+                Tab(
+                  icon: Icon(Icons.star_border),
+                  text: "Ulubione",
+                ),
+                Tab(
+                  icon: Icon(Icons.arrow_upward),
+                  text: "Statystyki",
+                ),
+              ]),
+        ]),
+        body: TabBarView(controller: _tabController, children: const <Widget>[
+          ListPage(),
+          FavouritePage(),
+          StatsPage(),
+        ]));
   }
 }

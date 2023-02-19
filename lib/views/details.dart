@@ -18,10 +18,10 @@ class _DetailsViewState extends State<DetailsView> {
     if (arg == null) {
       Navigator.of(context).pop();
     }
-    Weather weather = context
+    Weather? weather = context
         .read<WeatherProvider>()
-        .data!
-        .singleWhere((element) => element.stationId == arg);
+        .data
+        .singleWhere((element) => element?.stationId == arg);
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.black54,
@@ -49,7 +49,7 @@ class _DetailsViewState extends State<DetailsView> {
                     color: Colors.black54),
                 child: Center(
                   child: Text(
-                    weather.station ?? "Error 404",
+                    weather?.station ?? "Error 404",
                     style: const TextStyle(
                                 color: Colors.white,
                                 decoration: TextDecoration.none,
@@ -60,11 +60,11 @@ class _DetailsViewState extends State<DetailsView> {
                 ),
               ),
             ),
-            Detail.temperature(weather.temperature),
-            Detail.pressure(weather.pressure),
-            Detail.rain(weather.rain),
-            Detail.relativeHumidity(weather.relativeHumidity),
-            Detail.date(weather.date),
+            Detail.temperature(weather?.temperature),
+            Detail.pressure(weather?.pressure),
+            Detail.rain(weather?.rain),
+            Detail.relativeHumidity(weather?.relativeHumidity),
+            Detail.date(weather?.date),
             Padding(
       padding: const EdgeInsets.all(8),
       child: Container(
@@ -75,8 +75,8 @@ class _DetailsViewState extends State<DetailsView> {
             Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
           const Text("Wiatr", style: TextStyle(fontSize: 17)),
           Expanded(child: Container()),
-          Text("${weather.windSpeed}km/h", style: const TextStyle(fontSize: 17)),
-          Transform.rotate(angle: weather.windDirection! / 180 * math.pi,child: const Icon(Icons.arrow_upward)),
+          Text("${weather?.windSpeed}km/h", style: const TextStyle(fontSize: 17)),
+          Transform.rotate(angle: weather!.windDirection! / 180 * math.pi,child: const Icon(Icons.arrow_upward)),
         ]),
       ),
     ),
